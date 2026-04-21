@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Barishal Online Varieties Shop</title>
+
+<style>
+body{font-family:Arial;margin:0}
+
+/* LOGIN PAGE */
+#loginPage{
+  text-align:center;
+  background:#2ecc71;
+  color:#fff;
+  height:100vh;
+  padding-top:80px;
+}
+
+.loginBox{
+  background:#fff;
+  color:#000;
+  width:300px;
+  margin:auto;
+  padding:20px;
+  border-radius:10px;
+}
+
+.btnLogin{
+  padding:10px;
+  margin:5px;
+  border:none;
+  background:#2ecc71;
+  color:#fff;
+  cursor:pointer;
+  border-radius:5px;
+}
+
+/* MAIN APP */
+#app{display:none}
+body.appBody{background:#eef}
+
+.header{background:#00a2c7;color:red;text-align:center;padding:20px;font-size:40px;font-weight:bold}
+.sub{background:#00a2c7;text-align:center;padding-bottom:10px}
+
+.container{display:flex}
+.container{
+display:flex;
+align-items:flex-start;
+gap:10px;
+}
+
+.left{
+width:75%;
+}
+
+.right{
+width:25%;
+padding:10px;
+background:#fff;
+}
+
+/* Mobile Fix */
+@media(max-width:768px){
+.container{
+display:block;
+}
+
+.left{
+width:100%;
+}
+
+.right{
+width:100%;
+margin-top:20px;
+}
+
+table{
+display:block;
+overflow-x:auto;
+white-space:nowrap;
+}
+
+.btn{
+width:90%;
+display:block;
+margin:10px auto;
+}
+}
+.left{
+width:100%;
+}
+
+.right{
+width:100%;
+}
+}
+.left{width:75%}
+.right{width:25%;padding:10px;background:#fff}
+
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #000;padding:5px;text-align:center}
+
+.green{background:#00cc66}
+.yellow{background:#ffff00}
+.red{background:#ff3333;color:#fff}
+
+input{width:100%;border:none;text-align:center;background:transparent}
+
+.btn{
+  margin:10px;
+  padding:10px;
+  background:#007bff;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+
+.delBtn{
+  background:#ff3333;
+  color:#fff;
+  border:none;
+  padding:5px 8px;
+  cursor:pointer;
+}
+
+/* 🔥 সুন্দর Dashboard */
+.dashboard div{
+  margin:12px;
+  padding:18px;
+  font-weight:bold;
+  text-align:center;
+  font-size:20px;
+  border-radius:12px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+  transition:0.3s;
+}
+.dashboard div:hover{
+  transform:scale(1.05);
+}
+
+.dashboardTitle{
+  background: linear-gradient(45deg,#ffcc00,#ff9900);
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+  padding:10px;
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage" style="background:#dfe3e6;height:100vh;padding-top:0;">
+
+  <div style="background:#31c665;color:white;text-align:center;padding:50px 20px 40px;">
+    <h1 style="font-size:56px;margin:0;">🛒 Barishal Online Varieties Shop</h1>
+    <h2 style="margin-top:20px;">Login System</h2>
+  </div>
+
+  <div style="text-align:center;margin-top:25px;font-size:34px;">
+    ☎ 24-Hour Helpline: 01789-283860
+  </div>
+
+  <div style="text-align:center;margin-top:40px;font-size:34px;">
+    💳 Payment:
+    <span style="background:#e83e8c;color:#fff;padding:10px 22px;border-radius:30px;margin:6px;display:inline-block">bKash</span>
+    <span style="background:#8e44ad;color:#fff;padding:10px 22px;border-radius:30px;margin:6px;display:inline-block">Rocket</span>
+    <span style="background:#f39c12;color:#fff;padding:10px 22px;border-radius:30px;margin:6px;display:inline-block">Nagad</span>
+    <span style="background:#2ecc71;color:#fff;padding:10px 22px;border-radius:30px;margin:6px;display:inline-block">Upay</span>
+  </div>
+
+  <div style="text-align:center;margin-top:80px;">
+    <button onclick="setRole('user')" class="btnLogin">👤 User</button>
+    <button onclick="setRole('admin')" class="btnLogin">🔒 Admin</button>
+  </div>
+
+  <div style="text-align:center;margin-top:40px;">
+    <input
+      type="text"
+      id="mobile"
+      placeholder="📱 মোবাইল নম্বর দিন"
+      style="width:340px;padding:16px;border-radius:10px;border:1px solid #bbb;font-size:22px;"
+    >
+  </div>
+
+  <div style="text-align:center;margin-top:20px;">
+    <input
+      type="password"
+      id="pass"
+      placeholder="🔑 Password"
+      style="width:340px;padding:16px;border-radius:10px;border:1px solid #bbb;font-size:22px;"
+    >
+  </div>
+
+  <div style="text-align:center;margin-top:30px;">
+    <button onclick="login()" style="padding:14px 45px;font-size:24px;background:#27ae60;color:#fff;border:none;border-radius:12px;">
+      Login
+    </button>
+  </div>
+
+  <p id="msg" style="text-align:center;color:red;font-size:24px;"></p>
+
+</div>
+
+<!-- APP -->
+<div id="app">
+
+<div class="header">নাহিদা বেগম কম্পিউটার প্রশিক্ষণ কেন্দ্র</div>
+<div class="sub" style="font-size:30px;font-weight:bold;color:black;">
+জমা খরচ হিসাব
+</div>
+
+<!-- 👉 এই অংশটা শুধু filter dropdown replace করুন -->
+
+<div style="text-align:center;margin:10px;">
+
+<select id="yearFilter" onchange="filterData()">
+<option value="">সব সাল</option>
+<option value="2024">2024</option>
+<option value="2025">2025</option>
+<option value="2026">2026</option>
+<option value="2027">2027</option>
+<option value="2028">2028</option>
+<option value="2029">2029</option>
+<option value="2030">2030</option>
+<option value="2031">2031</option>
+<option value="2032">2032</option>
+<option value="2033">2033</option>
+<option value="2034">2034</option>
+<option value="2035">2035</option>
+<option value="2036">2036</option>
+<option value="2037">2037</option>
+<option value="2038">2038</option>
+<option value="2039">2039</option>
+<option value="2040">2040</option>
+<option value="2041">2041</option>
+<option value="2042">2042</option>
+<option value="2043">2043</option>
+<option value="2044">2044</option>
+<option value="2045">2045</option>
+<option value="2046">2046</option>
+<option value="2047">2047</option>
+<option value="2048">2048</option>
+<option value="2049">2049</option>
+<option value="2050">2050</option>
+</select>
+
+<select id="monthFilter" onchange="filterData()">
+<option value="">সব মাস</option>
+<option value="01">জানুয়ারি</option>
+<option value="02">ফেব্রুয়ারি</option>
+<option value="03">মার্চ</option>
+<option value="04">এপ্রিল</option>
+<option value="05">মে</option>
+<option value="06">জুন</option>
+<option value="07">জুলাই</option>
+<option value="08">আগস্ট</option>
+<option value="09">সেপ্টেম্বর</option>
+<option value="10">অক্টোবর</option>
+<option value="11">নভেম্বর</option>
+<option value="12">ডিসেম্বর</option>
+</select>
+
+</div>
+
+<div class="container">
+<div class="left">
+
+<table id="table">
+<thead>
+<tr>
+<th class="green">তারিখ</th>
+<th class="green">প্রশিক্ষক</th>
+
+<th class="green">অনলাইন আয়</th>
+<th class="green">টিউশন ফি</th>
+<th class="green">ভ্যারাইটিজ শপ</th>
+<th class="red">ঋণ</th>
+<th class="green">ঋণ পরিশোধ</th>
+<th class="yellow">বাসা খরচ</th>
+<th class="yellow">প্রতিষ্ঠান খরচ</th>
+<th class="red">মোট খরচ</th>
+<th class="green">ব্যালেন্স</th>
+<th class="red">ডিলেট</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button class="btn" onclick="addRow()">➕ নতুন লাইন</button>
+<button class="btn" onclick="saveData()">💾 Save</button>
+<button class="btn" onclick="downloadData()">⬇️ Download</button>
+<button class="btn" onclick="goBack()">⬅️ Back</button>
+<button class="btn" onclick="logout()">🚪 Logout</button>
+
+</div>
+
+<div class="right">
+<div class="dashboardTitle">📊 ড্যাশবোর্ড</div>
+
+<div class="dashboard">
+<div style="background:#0f0">মোট আয়<br><span id="income">0</span></div>
+<div style="background:#f33;color:#fff">মোট খরচ<br><span id="expense">0</span></div>
+<div style="background:#0f0">ক্যাশ<br><span id="balance">0</span></div>
+</div>
+</div>
+
+</div>
+</div>
+
+<script>
+let role="";
+let isAdmin=false;
+
+/* 🔥 FIX: elements define */
+let incomeEl, expenseEl, balanceEl;
+
+function setRole(r){role=r;}
+
+function login(){
+let mobile=document.getElementById("mobile").value;
+let pass=document.getElementById("pass").value;
+
+if(role==="admin" && mobile==="01789283860" && pass==="1234"){
+isAdmin=true;
+startApp();
+}
+else if(role==="user" && mobile==="01789283860" && pass==="1111"){
+isAdmin=false;
+startApp();
+}
+else{
+document.getElementById("msg").innerText="ভুল Mobile বা Password ❌";
+}
+}
+
+function startApp(){
+document.getElementById("loginPage").style.display="none";
+document.getElementById("app").style.display="block";
+document.body.classList.add("appBody");
+
+/* 🔥 FIX */
+incomeEl=document.getElementById("income");
+expenseEl=document.getElementById("expense");
+balanceEl=document.getElementById("balance");
+
+loadData();
+}
+
+function logout(){location.reload();}
+
+/* 🔥 Back button */
+function goBack(){
+  if(confirm("আপনি কি Login page এ ফিরে যেতে চান?")){
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="block";
+    document.body.classList.remove("appBody");document.getElementById("pass").value="";
+  }
+}
+function addRow(data=[]){
+let tbody=document.querySelector("#table tbody");
+let row=tbody.insertRow();
+
+for(let i=0;i<11;i++){
+let cell=row.insertCell();
+let input=document.createElement("input");
+input.type=(i==0)?"date":(i==1)?"text":"number";
+input.value=data[i]||"";
+input.oninput=calc;
+cell.appendChild(input);
+}
+
+let del=row.insertCell();
+let btn=document.createElement("button");
+btn.innerText="❌";
+btn.className="delBtn";
+btn.onclick=function(){
+if(!isAdmin){alert("শুধু Admin ডিলেট করতে পারবে!");return;}
+row.remove();calc();saveData();
+};
+del.appendChild(btn);
+
+calc();
+}
+
+function calc(){
+
+let rows=document.querySelectorAll("#table tbody tr");
+
+let totalI=0;
+let totalE=0;
+
+rows.forEach(r=>{
+
+if(r.style.display==="none") return;
+
+let i=r.querySelectorAll("input");
+
+let income=
+(+i[2].value||0)+
+(+i[3].value||0)+
+(+i[4].value||0)+
+(+i[5].value||0);
+
+let expense=
+(+i[6].value||0)+
+(+i[7].value||0)+
+(+i[8].value||0);
+
+i[9].value=expense;
+
+i[10].value=income-expense;
+
+totalI+=income;
+totalE+=expense;
+
+});
+
+incomeEl.innerText=totalI;
+expenseEl.innerText=totalE;
+balanceEl.innerText=totalI-totalE;
+
+}
+
+function saveData(){
+let data=[];
+document.querySelectorAll("#table tbody tr").forEach(r=>{
+let row=[];
+r.querySelectorAll("input").forEach(i=>row.push(i.value));
+data.push(row);
+});
+localStorage.setItem("accountData",JSON.stringify(data));
+alert("Save Done!");
+}
+
+function loadData(){
+let data=JSON.parse(localStorage.getItem("accountData")||"[]");
+if(data.length===0){addRow();}
+else{data.forEach(d=>addRow(d));}
+}
+
+function filterData(){
+  let year = document.getElementById("yearFilter").value;
+  let month = document.getElementById("monthFilter").value;
+
+  document.querySelectorAll("#table tbody tr").forEach(r=>{
+    let date = r.querySelectorAll("input")[0].value;
+
+    if(!date){
+      r.style.display="";
+      return;
+    }
+
+    let y = date.split("-")[0];
+    let m = date.split("-")[1];
+
+    if(
+      (year === "" || year === y) &&
+      (month === "" || month === m)
+    ){
+      r.style.display="";
+    } else {
+      r.style.display="none";
+    }
+  });
+
+  calc();
+}
+function downloadData(){
+
+let csv="\uFEFF";
+
+csv+="তারিখ,প্রশিক্ষক,অনলাইন আয়,টিউশন ফি,ভ্যারাইটিজ শপ,ঋণ,ঋণ পরিশোধ,বাসা খরচ,প্রতিষ্ঠান খরচ,মোট খরচ,ব্যালেন্স\n";
+
+document.querySelectorAll("#table tbody tr").forEach(r=>{
+let values=[];
+
+r.querySelectorAll("input").forEach(i=>{
+values.push(i.value);
+});
+
+csv+=values.join(",")+"\n";
+
+});
+
+/* Dashboard export */
+csv+="\n";
+csv+="📊 ড্যাশবোর্ড\n";
+csv+="মোট আয়," + incomeEl.innerText + "\n";
+csv+="মোট খরচ," + expenseEl.innerText + "\n";
+csv+="ক্যাশ," + balanceEl.innerText + "\n";
+
+let blob=new Blob([csv],{
+type:"text/csv;charset=utf-8;"
+});
+
+let a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="hisab.csv";
+a.click();
+
+}
+</script>
+
+</body>
+</html>
