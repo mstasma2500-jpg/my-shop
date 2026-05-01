@@ -148,6 +148,40 @@ input{width:100%;border:none;text-align:center;background:transparent}
   padding:10px;
   border-radius:10px;
 }
+<style>
+
+/* আগের সব CSS থাকবে এখানে */
+
+.btn3d{
+  padding:14px 40px;
+  font-size:22px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  color:#fff;
+  transition:0.2s;
+  margin:10px;
+  position:relative;
+  box-shadow:0 6px 0 rgba(0,0,0,0.3);
+}
+
+/* USER BUTTON */
+.userBtn{
+  background:linear-gradient(145deg,#2ecc71,#27ae60);
+}
+
+/* ADMIN BUTTON */
+.adminBtn{
+  background:linear-gradient(145deg,#e74c3c,#c0392b);
+}
+
+/* 3D PRESS EFFECT */
+.btn3d:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 rgba(0,0,0,0.3);
+}
+
+</style>
 </style>
 </head>
 
@@ -174,8 +208,9 @@ input{width:100%;border:none;text-align:center;background:transparent}
   </div>
 
   <div style="text-align:center;margin-top:80px;">
-    <button onclick="setRole('user')" class="btnLogin">👤 User</button>
-    <button onclick="setRole('admin')" class="btnLogin">🔒 Admin</button>
+    <button class="btn3d userBtn" onclick="setRole('user')">👤 User</button>
+
+<button class="btn3d adminBtn" onclick="setRole('admin')">🔒 Admin</button>
   </div>
 
   <div style="text-align:center;margin-top:40px;">
@@ -201,7 +236,11 @@ input{width:100%;border:none;text-align:center;background:transparent}
       Login
     </button>
   </div>
-
+<div style="text-align:center;margin-top:15px;">
+  <button onclick="register()" style="padding:10px 35px;font-size:20px;background:#2980b9;color:#fff;border:none;border-radius:10px;">
+    Register
+  </button>
+</div>
   <p id="msg" style="text-align:center;color:red;font-size:24px;"></p>
 
 </div>
@@ -219,7 +258,7 @@ input{width:100%;border:none;text-align:center;background:transparent}
 <div style="text-align:center;margin:10px;">
 
 <select id="yearFilter" onchange="filterData()">
-<option value="">সব সাল</option>
+<option value="">সাল নির্বাচন</option>
 <option value="2024">2024</option>
 <option value="2025">2025</option>
 <option value="2026">2026</option>
@@ -250,7 +289,7 @@ input{width:100%;border:none;text-align:center;background:transparent}
 </select>
 
 <select id="monthFilter" onchange="filterData()">
-<option value="">সব মাস</option>
+<option value="">মাস নির্বাচন</option>
 <option value="01">জানুয়ারি</option>
 <option value="02">ফেব্রুয়ারি</option>
 <option value="03">মার্চ</option>
@@ -275,7 +314,7 @@ input{width:100%;border:none;text-align:center;background:transparent}
 <tr>
 <th class="green">তারিখ</th>
 <th class="green">প্রশিক্ষক</th>
-
+<th class="yellow">প্রশিক্ষক সম্মানী</th>
 <th class="green">অনলাইন আয়</th>
 <th class="green">টিউশন ফি</th>
 <th class="green">ভ্যারাইটিজ শপ</th>
@@ -305,19 +344,21 @@ input{width:100%;border:none;text-align:center;background:transparent}
 <div class="dashboard">
 <div style="background:#0f0">মোট আয়<br><span id="income">0</span></div>
 <div style="background:#f33;color:#fff">মোট খরচ<br><span id="expense">0</span></div>
+<div style="background:#ffcc00">প্রশিক্ষক সম্মানী<br><span id="trainer">0</span></div>
 <div style="background:#0f0">ক্যাশ<br><span id="balance">0</span></div>
 </div>
 </div>
 
 </div>
 </div>
-
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
 let role="";
 let isAdmin=false;
 
 /* 🔥 FIX: elements define */
-let incomeEl, expenseEl, balanceEl;
+let incomeEl, expenseEl, balanceEl, trainerEl;
 
 function setRole(r){role=r;}
 
@@ -347,11 +388,20 @@ document.body.classList.add("appBody");
 incomeEl=document.getElementById("income");
 expenseEl=document.getElementById("expense");
 balanceEl=document.getElementById("balance");
+trainerEl=document.getElementById("trainer");
 
 loadData();
 }
 
-function logout(){location.reload();}
+function logout(){
+  auth.signOut().then(()=>{
+    localStorage.clear();
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="block";
+    document.body.classList.remove("appBody");
+    location.reload();
+  });
+}
 
 /* 🔥 Back button */
 function goBack(){
@@ -365,12 +415,18 @@ function addRow(data=[]){
 let tbody=document.querySelector("#table tbody");
 let row=tbody.insertRow();
 
-for(let i=0;i<11;i++){
+for(let i=0;i<12;i++){
 let cell=row.insertCell();
 let input=document.createElement("input");
 input.type=(i==0)?"date":(i==1)?"text":"number";
 input.value=data[i]||"";
 input.oninput=calc;
+
+/* 🔥 NEW RULE */
+if(!isAdmin && data[i]){
+  input.disabled = true;
+}
+
 cell.appendChild(input);
 }
 
@@ -378,10 +434,22 @@ let del=row.insertCell();
 let btn=document.createElement("button");
 btn.innerText="❌";
 btn.className="delBtn";
+
 btn.onclick=function(){
-if(!isAdmin){alert("শুধু Admin ডিলেট করতে পারবে!");return;}
-row.remove();calc();saveData();
+
+  if(!isAdmin){
+    alert("শুধু Admin ডিলেট করতে পারবে!");
+    return;
+  }
+
+  if(confirm("আপনি কি নিশ্চিত ডিলেট করতে চান?")){
+    row.remove();
+    calc();
+    saveData();
+  }
+
 };
+
 del.appendChild(btn);
 
 calc();
@@ -393,27 +461,29 @@ let rows=document.querySelectorAll("#table tbody tr");
 
 let totalI=0;
 let totalE=0;
+let totalTrainer = 0;
 
 rows.forEach(r=>{
 
 if(r.style.display==="none") return;
 
 let i=r.querySelectorAll("input");
+totalTrainer += (+i[2].value||0);
 
-let income=
-(+i[2].value||0)+
+let income =
 (+i[3].value||0)+
 (+i[4].value||0)+
-(+i[5].value||0);
+(+i[5].value||0)+
+(+i[6].value||0);
 
-let expense=
-(+i[6].value||0)+
+let expense =
+(+i[2].value||0)+
 (+i[7].value||0)+
-(+i[8].value||0);
+(+i[8].value||0)+
+(+i[9].value||0);
 
-i[9].value=expense;
-
-i[10].value=income-expense;
+i[10].value=expense;
+i[11].value=income-expense;
 
 totalI+=income;
 totalE+=expense;
@@ -423,6 +493,7 @@ totalE+=expense;
 incomeEl.innerText=totalI;
 expenseEl.innerText=totalE;
 balanceEl.innerText=totalI-totalE;
+trainerEl.innerText = totalTrainer;
 
 }
 
@@ -434,13 +505,17 @@ r.querySelectorAll("input").forEach(i=>row.push(i.value));
 data.push(row);
 });
 localStorage.setItem("accountData",JSON.stringify(data));
-alert("Save Done!");
+
+/* 🔥 user হলে lock */
+if(!isAdmin){
+  document.querySelectorAll("#table tbody input").forEach(i=>{
+    if(i.value !== ""){
+      i.disabled = true;
+    }
+  });
 }
 
-function loadData(){
-let data=JSON.parse(localStorage.getItem("accountData")||"[]");
-if(data.length===0){addRow();}
-else{data.forEach(d=>addRow(d));}
+alert("Save Done!");
 }
 
 function filterData(){
@@ -474,7 +549,7 @@ function downloadData(){
 
 let csv="\uFEFF";
 
-csv+="তারিখ,প্রশিক্ষক,অনলাইন আয়,টিউশন ফি,ভ্যারাইটিজ শপ,ঋণ,ঋণ পরিশোধ,বাসা খরচ,প্রতিষ্ঠান খরচ,মোট খরচ,ব্যালেন্স\n";
+csv+="তারিখ,প্রশিক্ষক,প্রশিক্ষক সম্মানী,অনলাইন আয়,টিউশন ফি,ভ্যারাইটিজ শপ,ঋণ,ঋণ পরিশোধ,বাসা খরচ,প্রতিষ্ঠান খরচ,মোট খরচ,ব্যালেন্স\n";
 
 document.querySelectorAll("#table tbody tr").forEach(r=>{
 let values=[];
@@ -505,6 +580,195 @@ a.click();
 
 }
 </script>
+<!-- FIREBASE SCRIPT -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+<script>
+/* 🔥 YOUR FIREBASE CONFIG (এটা নিজেরটা বসাও) */
+const firebaseConfig = {
+  apiKey: "AIzaSyCTQVjJDvASpwCS0DqO4ZGrFn2OPS2FwYM",
+  authDomain: "borishal-online-varieties.firebaseapp.com",
+  databaseURL: "https://borishal-online-varieties-default-rtdb.firebaseio.com",
+  projectId: "borishal-online-varieties",
+  storageBucket: "borishal-online-varieties.firebasestorage.app",
+  messagingSenderId: "957306151653",
+  appId: "1:957306151653:web:c4b759cc8ab6b32ccfea0c",
+  measurementId: "G-8C04N7HF8V"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let role="";
+let isAdmin=false;
+
+let incomeEl, expenseEl, balanceEl, trainerEl;
+
+function setRole(r){role=r;}
+
+/* 🔐 REGISTER */
+function register(){
+  let mobile = document.getElementById("mobile").value;
+  let pass = document.getElementById("pass").value;
+
+  let email = mobile + "@shop.com";
+
+  auth.createUserWithEmailAndPassword(email, pass)
+  .then(()=>alert("Account Created ✅"))
+  .catch(e=>alert(e.message));
+}
+
+/* 🔐 LOGIN */
+function login(){
+  let mobile = document.getElementById("mobile").value;
+  let pass = document.getElementById("pass").value;
+
+  let email = mobile + "@shop.com";
+
+  auth.signInWithEmailAndPassword(email, pass)
+  .then(()=>{
+    isAdmin = (role==="admin");
+    startApp();
+  })
+  .catch(()=>{
+    document.getElementById("msg").innerText="Login Failed ❌";
+  });
+}
+
+function startApp(){
+  document.getElementById("loginPage").style.display="none";
+  document.getElementById("app").style.display="block";
+
+  incomeEl=document.getElementById("income");
+  expenseEl=document.getElementById("expense");
+  balanceEl=document.getElementById("balance");
+  trainerEl=document.getElementById("trainer");
+
+  loadData();
+}
+
+function logout(){
+  auth.signOut().then(()=>{
+    localStorage.clear();
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="block";
+    document.body.classList.remove("appBody");
+    location.reload();
+  });
+}
+
+function addRow(data=[]){
+let tbody=document.querySelector("#table tbody");
+let row=tbody.insertRow();
+
+for(let i=0;i<12;i++){
+let cell=row.insertCell();
+let input=document.createElement("input");
+input.type=(i==0)?"date":(i==1)?"text":"number";
+input.value=data[i]||"";
+input.oninput=calc;
+
+if(!isAdmin && data[i]){
+  input.disabled=true;
+}
+
+cell.appendChild(input);
+}
+
+let del=row.insertCell();
+let btn=document.createElement("button");
+btn.innerText="❌";
+
+btn.onclick=function(){
+if(!isAdmin){alert("Admin only");return;}
+row.remove(); calc(); saveData();
+};
+
+del.appendChild(btn);
+calc();
+}
+
+function calc(){
+let rows=document.querySelectorAll("#table tbody tr");
+
+let totalI=0,totalE=0,totalTrainer=0;
+
+rows.forEach(r=>{
+let i=r.querySelectorAll("input");
+
+totalTrainer += (+i[2].value||0);
+
+let income =
+(+i[3].value||0)+
+(+i[4].value||0)+
+(+i[5].value||0)+
+(+i[6].value||0);
+
+let expense =
+(+i[2].value||0)+
+(+i[7].value||0)+
+(+i[8].value||0)+
+(+i[9].value||0);
+
+i[10].value=expense;
+i[11].value=income-expense;
+
+totalI+=income;
+totalE+=expense;
+});
+
+incomeEl.innerText=totalI;
+expenseEl.innerText=totalE;
+balanceEl.innerText=totalI-totalE;
+trainerEl.innerText=totalTrainer;
+}
+
+/* ☁️ SAVE TO FIRESTORE */
+function saveData(){
+let data=[];
+
+document.querySelectorAll("#table tbody tr").forEach(r=>{
+let row=[];
+r.querySelectorAll("input").forEach(i=>row.push(i.value));
+data.push(row);
+});
+
+db.collection("accounts").doc("main").set({data})
+.then(()=>alert("Saved ☁️"));
+}
+
+/* ☁️ LOAD FROM FIRESTORE */
+function loadData(){
+  let tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";   // ⭐ IMPORTANT FIX
+
+  db.collection("accounts").doc("main").get()
+  .then(doc=>{
+    if(doc.exists && doc.data().data){
+      doc.data().data.forEach(d=>addRow(d));
+    } else {
+      addRow();
+    }
+    calc();
+  });
+}
+</script>
+<script>
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById("loginPage").style.display="none";
+    document.getElementById("app").style.display="block";
+    document.body.classList.add("appBody");
+  }else{
+    document.getElementById("app").style.display="none";
+    document.getElementById("loginPage").style.display="block";
+    document.body.classList.remove("appBody");
+  }
+});
+</script>
 </body>
 </html>
